@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ラジオ体操クイズ</title>
+<meta name="description" content="廣播體操第一 1–12 動作猜謎：看動作選出正確的日文名稱，邊玩邊學日文。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf5ea; --bg2:#f3e8d4; --card:#fffdf8; --ink:#2a2733; --muted:#6f6a78;
+  --line:#e6dccb; --accent:#e8572a; --accent-soft:#fde3d6; --sun:#f4a52b;
+  --ok:#23915f; --ok-soft:#d9f2e5; --ng:#d23c3c; --ng-soft:#fbdede;
+  --stamp:#d1302c; --limb:#2a2733; --hi:#e8572a; --far:#b9b1c3;
+  --shadow:0 2px 0 rgba(42,39,51,.08), 0 8px 24px -12px rgba(42,39,51,.25);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1c1a22; --bg2:#25222d; --card:#2a2733; --ink:#f3eee6; --muted:#a8a1b3;
+    --line:#3d3947; --accent:#ff7a4d; --accent-soft:#4a2b22; --sun:#f4b04a;
+    --ok:#4fcf8e; --ok-soft:#1f3b2e; --ng:#ff6b6b; --ng-soft:#4a2526;
+    --stamp:#ff5a52; --limb:#f3eee6; --hi:#ff7a4d; --far:#6c6578;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1c1a22; --bg2:#25222d; --card:#2a2733; --ink:#f3eee6; --muted:#a8a1b3;
+  --line:#3d3947; --accent:#ff7a4d; --accent-soft:#4a2b22; --sun:#f4b04a;
+  --ok:#4fcf8e; --ok-soft:#1f3b2e; --ng:#ff6b6b; --ng-soft:#4a2526;
+  --stamp:#ff5a52; --limb:#f3eee6; --hi:#ff7a4d; --far:#6c6578;
+  --shadow:0 2px 0 rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Zen Maru Gothic","PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-weight:500; line-height:1.6; -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+button{font:inherit;color:inherit}
+.wrap{max-width:720px;margin:0 auto;padding:16px 16px 48px}
+[hidden]{display:none!important}
+.jp{font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif}
+ruby rt{font-size:.5em;color:var(--muted);font-weight:500;letter-spacing:0}
+body.no-ruby ruby rt{visibility:hidden}
+
+/* ---------- top bar ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:900;font-size:15px;background:none;border:0;padding:4px 0;cursor:pointer}
+.sunmark{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--accent) 0 55%,transparent 56%),repeating-conic-gradient(var(--sun) 0 12deg,transparent 12deg 30deg);flex:none}
+.tools{display:flex;gap:6px}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.chip:focus-visible,.btn:focus-visible,.opt:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+/* ---------- cards / buttons ---------- */
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;padding:14px 20px;font-weight:700;font-size:17px;cursor:pointer;transition:transform .08s ease, filter .15s}
+.btn:active{transform:translateY(2px)}
+.btn.primary{background:var(--accent);color:#fff;box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.btn.primary:active{box-shadow:0 2px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.btn.ghost{background:var(--bg2);color:var(--ink)}
+.btn.small{padding:8px 14px;font-size:14px;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ---------- home ---------- */
+.hero{text-align:center;padding:28px 20px 24px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:auto -20% -60% -20%;height:120%;background:radial-gradient(closest-side,var(--accent-soft),transparent);z-index:0}
+.hero>*{position:relative}
+.hero .eyebrow{font-size:13px;color:var(--muted);letter-spacing:.1em}
+.hero h1{margin:4px 0 2px;font-size:clamp(28px,7vw,42px);font-weight:900;line-height:1.25}
+.hero h1 .no{color:var(--accent)}
+.hero .sub{margin:0 0 16px;color:var(--muted)}
+.hero-fig{width:150px;height:150px;margin:0 auto}
+.menu{display:grid;gap:10px;margin-top:18px}
+.menu .btn{width:100%}
+.menu .btn.primary{flex-direction:column;gap:0}
+.menu small{display:block;font-weight:500;font-size:12px;opacity:.85}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+h2{font-size:18px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h2 .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bg2);color:var(--muted)}
+.section{margin-top:16px}
+.how{margin:0;padding-left:1.2em;color:var(--muted);font-size:14px}
+.how li{margin:2px 0}
+
+/* ---------- leaderboard ---------- */
+.board{list-style:none;margin:0;padding:0}
+.board li{display:grid;grid-template-columns:34px 1fr auto auto;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px dashed var(--line);font-size:15px}
+.board li:last-child{border-bottom:0}
+.board .rk{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:13px;background:var(--bg2)}
+.board li:nth-child(1) .rk{background:#f4c430;color:#5a4200}
+.board li:nth-child(2) .rk{background:#cfd4dc;color:#3b4150}
+.board li:nth-child(3) .rk{background:#e2a56f;color:#5a2e0b}
+.board .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .sc{font-weight:900}
+.board .tm{color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px;min-width:48px;text-align:right}
+.board li.me{background:var(--accent-soft);border-radius:10px}
+.board .empty{display:block;color:var(--muted);text-align:center;padding:16px;border:0}
+.note{font-size:12px;color:var(--muted);margin:8px 0 0}
+
+/* ---------- quiz ---------- */
+.qhead{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted);margin-bottom:8px}
+.qhead b{color:var(--ink);font-size:18px}
+.timer{font-variant-numeric:tabular-nums}
+.stamps{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-bottom:12px}
+.stamps span{aspect-ratio:1;border-radius:50%;border:1.5px dashed var(--line);display:grid;place-items:center;font-size:10px;color:var(--muted);position:relative}
+.stamps span.cur{border-style:solid;border-color:var(--accent)}
+.stamps span.ok{border:0;background:var(--stamp);color:#fff;font-weight:900;transform:rotate(-12deg)}
+.stamps span.ng{border-style:solid;border-color:var(--line);background:var(--bg2)}
+.stamps span.ok.pop{animation:stampPop .35s ease-out}
+@keyframes stampPop{0%{transform:scale(2.2) rotate(-30deg);opacity:0}70%{transform:scale(.9) rotate(-10deg);opacity:1}100%{transform:scale(1) rotate(-12deg)}}
+.stage{position:relative;background:linear-gradient(180deg,var(--bg2),var(--card));border-radius:16px;padding:8px 8px 0;overflow:hidden}
+.stage .fig{display:block;width:100%;max-width:260px;max-height:36vh;height:auto;aspect-ratio:200/222;margin:0 auto}
+.stage .ctrl{position:absolute;right:8px;top:8px;display:flex;gap:6px}
+.stage .view{position:absolute;left:10px;top:10px;font-size:12px;color:var(--muted);background:var(--card);padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
+.ask{text-align:center;margin:14px 0 10px}
+.ask .ja{font-size:20px;font-weight:900}
+.ask .zh{font-size:13px;color:var(--muted)}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:14px 16px;cursor:pointer;font-size:clamp(17px,4.6vw,21px);font-weight:700;line-height:1.9;transition:border-color .15s, background .15s, transform .08s}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:active:not(:disabled){transform:translateY(2px)}
+.opt .k{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--bg2);font-size:14px;line-height:1}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--ng);background:var(--ng-soft)}
+.opt.wrong .k{background:var(--ng);color:#fff}
+.opt:disabled{cursor:default}
+.opt.dim{opacity:.55}
+.fb{margin-top:12px;border-radius:16px;padding:14px 16px;border:2px solid var(--line);animation:rise .25s ease-out}
+.fb.ok{border-color:var(--ok);background:var(--ok-soft)}
+.fb.ng{border-color:var(--ng);background:var(--ng-soft)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fb .verdict{font-weight:900;font-size:18px;display:flex;align-items:center;gap:8px}
+.fb .name{font-size:19px;font-weight:900;margin:4px 0 0;line-height:2}
+.fb .zh{color:var(--muted);font-size:14px}
+.fb .tip{font-size:14px;margin:8px 0 0}
+.vocab{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vocab button{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:3px 10px;font-size:14px;cursor:pointer}
+.vocab button b{font-weight:900}
+.vocab button span{color:var(--muted);font-size:12px;margin-left:4px}
+.fb-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px}
+.say{border:0;background:var(--card);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+
+/* ---------- result ---------- */
+.result{text-align:center}
+.bigscore{font-size:64px;font-weight:900;line-height:1;margin:8px 0}
+.bigscore small{font-size:24px;color:var(--muted)}
+.title-badge{display:inline-block;background:var(--accent);color:#fff;font-weight:900;padding:4px 14px;border-radius:999px;transform:rotate(-2deg)}
+.stats{display:flex;justify-content:center;gap:20px;color:var(--muted);margin:10px 0 4px;font-size:14px}
+.stats b{display:block;color:var(--ink);font-size:20px}
+.submit{display:flex;gap:8px;margin-top:12px}
+.submit input{flex:1;min-width:0;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;color:var(--ink)}
+.submit input:focus{outline:none;border-color:var(--accent)}
+.review{list-style:none;margin:0;padding:0;text-align:left}
+.review li{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.review li:last-child{border-bottom:0}
+.review svg{width:56px;height:62px;flex:none;background:var(--bg2);border-radius:10px}
+.review .t{font-weight:700;line-height:1.9}
+.review .t small{display:block;color:var(--muted);font-weight:500;line-height:1.4}
+.allright{color:var(--ok);font-weight:700;text-align:center;padding:8px}
+
+/* ---------- gallery ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.g{padding:12px}
+.g .stage{padding:4px 4px 0}
+.g .stage .fig{max-width:170px}
+.g .no{font-size:12px;color:var(--accent);font-weight:900}
+.g .nm{font-weight:900;font-size:16px;line-height:2;margin:2px 0}
+.g .zh{color:var(--muted);font-size:13px}
+.g .tip{font-size:13px;margin:6px 0 0}
+.g .row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:9;max-width:calc(100% - 32px);animation:rise .2s}
+footer{margin-top:24px;text-align:center;font-size:12px;color:var(--muted)}
+footer a{color:inherit}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <button class="brand jp" id="homeBtn" aria-label="回首頁"><span class="sunmark" aria-hidden="true"></span>ラジオ体操クイズ</button>
+    <div class="tools">
+      <button class="chip jp" id="rubyBtn" aria-pressed="true" title="顯示／隱藏假名標音">ふりがな</button>
+      <button class="chip" id="themeBtn" title="切換深淺色">◐</button>
+    </div>
+  </header>
+
+  <!-- ================= HOME ================= -->
+  <main id="home">
+    <section class="card hero">
+      <div class="eyebrow jp">ラジオ体操第一・1〜12</div>
+      <h1 class="jp">この<span class="no">うんどう</span>、<br>なーんだ？</h1>
+      <p class="sub">看動作，選出正確的日文名稱</p>
+      <svg class="hero-fig fig" id="heroFig" viewBox="0 -24 200 222" aria-hidden="true"></svg>
+      <div class="menu">
+        <button class="btn primary" data-start="random">開始挑戰<small>12 題隨機出題・可登上排行榜</small></button>
+        <div class="two">
+          <button class="btn ghost" data-start="order">照順序練習</button>
+          <button class="btn ghost" id="galleryBtn">動作圖鑑</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card section">
+      <h2>🏆 排行榜 <span class="tag" id="boardTag">讀取中…</span></h2>
+      <ol class="board" id="board"></ol>
+      <p class="note" id="boardNote"></p>
+    </section>
+
+    <section class="card section">
+      <h2>怎麼玩</h2>
+      <ol class="how">
+        <li>畫面上的小人會做出一個動作，橘色是主要在動的部位。</li>
+        <li>從兩個日文選項選出正確的名稱。答對會在集章卡蓋一個章。</li>
+        <li>答完會看到讀音、中文意思和動作要點，按 🔊 可以聽發音。</li>
+        <li>右上角「ふりがな」可以關掉假名，挑戰只看漢字。</li>
+      </ol>
+    </section>
+  </main>
+
+  <!-- ================= QUIZ ================= -->
+  <main id="quiz" hidden>
+    <div class="qhead">
+      <span>第 <b id="qNo">1</b> / 12 題 <span id="qMode"></span></span>
+      <span class="timer" id="timer">0:00</span>
+    </div>
+    <div class="stamps" id="stamps" aria-label="集章卡"></div>
+    <section class="card" style="padding:14px">
+      <div class="stage">
+        <span class="view" id="qView">正面</span>
+        <div class="ctrl"><button class="chip" id="slowBtn" aria-pressed="false" title="慢動作">🐢 慢速</button></div>
+        <svg class="fig" id="qFig" viewBox="0 -24 200 222" role="img" aria-label="體操動作圖"></svg>
+      </div>
+      <div class="ask">
+        <div class="ja jp">これは何の運動？</div>
+        <div class="zh">這是什麼運動？（按 1 / 2 也可以作答）</div>
+      </div>
+      <div class="opts" id="opts"></div>
+      <div id="fb"></div>
+    </section>
+  </main>
+
+  <!-- ================= RESULT ================= -->
+  <main id="result" hidden>
+    <section class="card result">
+      <div class="title-badge jp" id="rTitle">すごい！</div>
+      <div class="bigscore"><span id="rScore">0</span><small> / 12</small></div>
+      <div class="stamps" id="rStamps"></div>
+      <div class="stats">
+        <div><b id="rTime">0:00</b>用時</div>
+        <div><b id="rBest">—</b>我的最佳</div>
+      </div>
+      <div id="submitBox">
+        <form class="submit" id="submitForm">
+          <input id="nick" maxlength="10" placeholder="輸入暱稱（最多 10 字）" autocomplete="nickname" required>
+          <button class="btn primary small" id="submitBtn">登上排行榜</button>
+        </form>
+        <p class="note" id="submitNote"></p>
+      </div>
+      <p class="note" id="orderNote" hidden>照順序練習不列入排行榜，想上榜請玩「開始挑戰」。</p>
+      <div class="two" style="margin-top:14px">
+        <button class="btn primary" id="againBtn">再玩一次</button>
+        <button class="btn ghost" id="toHome">回首頁</button>
+      </div>
+    </section>
+    <section class="card section">
+      <h2>答錯的動作</h2>
+      <ul class="review" id="review"></ul>
+    </section>
+    <section class="card section">
+      <h2>🏆 排行榜 <span class="tag" id="boardTag2"></span></h2>
+      <ol class="board" id="board2"></ol>
+    </section>
+  </main>
+
+  <!-- ================= GALLERY ================= -->
+  <main id="gallery" hidden>
+    <h2 style="font-size:22px">動作圖鑑 <span class="tag">ラジオ体操第一</span></h2>
+    <p class="note" style="margin:-4px 0 12px">先把 12 個動作看一遍，再去挑戰吧！點名稱旁的 🔊 聽發音。</p>
+    <div class="grid" id="grid"></div>
+    <div style="text-align:center;margin-top:16px"><button class="btn primary" data-start="random">我準備好了，開始挑戰</button></div>
+  </main>
+
+  <footer>動作名稱與要點參考：<a href="https://www.jp-life.japanpost.jp/radio/instruction/radio_first.html" target="_blank" rel="noopener">かんぽ生命「ラジオ体操第一」</a>。人物圖為自繪示意圖。</footer>
+</div>
+
+<script>
+/* ============================================================
+   排行榜設定（Supabase）
+   到 Supabase 專案的 Project Settings → API Keys 複製：
+   - SUPABASE_URL：Project URL，例如 'https://abcdxyz.supabase.co'
+   - SUPABASE_KEY：publishable key（sb_publishable_…）或 anon public key
+   這兩個本來就是公開用的，可以放在網頁裡。
+   兩個都留空的話，排行榜只會記在每個人自己的裝置。
+   ============================================================ */
+const SUPABASE_URL = 'https://cmwjcwwyxlxmmlitkqiw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_vzhaWSTguQuYBbRpvCmAJg_UV9RCEJy';
+
+/* ---------------- 資料 ---------------- */
+// {漢字|かな} 會轉成 <ruby>
+const ACTIONS = [
+  {no:1, name:'{伸|の}びの{運動|うんどう}', zh:'伸展運動',
+   aim:'伸直背脊，做出良好姿勢', tip:'手臂伸直，慢慢往高處舉，挺直背脊。',
+   words:[['伸びる','のびる','伸展'],['運動','うんどう','運動']],
+   view:'front', hi:['arms'], ms:900,
+   keys:[{}, {la:178,ra:178}, {la:178,ra:178}, {la:95,ra:95}]},
+  {no:2, name:'{腕|うで}を{振|ふ}って{脚|あし}を{曲|ま}げ{伸|の}ばす{運動|うんどう}', zh:'擺臂屈伸腿運動',
+   aim:'腿部有精神地動，促進全身血液循環', tip:'腳跟上下配合手臂的擺動，要有節奏感。',
+   words:[['腕','うで','手臂'],['振る','ふる','揮動'],['脚','あし','腿'],['曲げる','まげる','彎曲'],['伸ばす','のばす','伸直']],
+   view:'front', hi:['legs','arms'], ms:520,
+   keys:[{la:-28,ra:-28,knee:16}, {la:100,ra:100}]},
+  {no:3, name:'{腕|うで}を{回|まわ}す{運動|うんどう}', zh:'繞臂運動',
+   aim:'讓肩膀周圍的肌肉保持柔軟', tip:'放鬆手臂和肩膀，利用離心力大大地轉。',
+   words:[['腕','うで','手臂'],['回す','まわす','轉動']],
+   view:'front', hi:['arms'], ms:420,
+   keys:[{la:-30,ra:-30,knee:10}, {la:60,ra:60}, {la:178,ra:178}, {la:120,ra:120}, {la:40,ra:40,knee:6}]},
+  {no:4, name:'{胸|むね}を{反|そ}らす{運動|うんどう}', zh:'挺胸運動',
+   aim:'做出正確姿勢，幫助呼吸器官運作', tip:'記得深呼吸，臉不要抬得太高。',
+   words:[['胸','むね','胸部'],['反らす','そらす','向後仰']],
+   view:'side', hi:['torso','arms'], ms:700, peak:2,
+   keys:[{}, {la:80,ra:80}, {la:205,ra:205,lean:-24}, {la:205,ra:205,lean:-24}]},
+  {no:5, name:'{体|からだ}を{横|よこ}に{曲|ま}げる{運動|うんどう}', zh:'體側彎運動',
+   aim:'伸展平常很少動到的側腹肌肉', tip:'不要往前彎，手臂從正側邊舉起。',
+   words:[['体','からだ','身體'],['横','よこ','側邊'],['曲げる','まげる','彎曲']],
+   view:'front', hi:['torso','arms'], ms:650, peak:1, spread:12,
+   keys:[{la:55,ra:55,le:-110,re:-110}, {tilt:-32,ra:172,la:55,le:-110}, {tilt:-32,ra:172,la:55,le:-110}, {la:55,ra:55,le:-110,re:-110}, {tilt:32,la:172,ra:55,re:-110}, {tilt:32,la:172,ra:55,re:-110}]},
+  {no:6, name:'{体|からだ}を{前後|ぜんご}に{曲|ま}げる{運動|うんどう}', zh:'身體前後彎運動',
+   aim:'提高背部與腹部柔軟度，減輕腰部負擔', tip:'前彎時放鬆脖子和肩膀，用上半身的重量帶出彈性。',
+   words:[['体','からだ','身體'],['前後','ぜんご','前後'],['曲げる','まげる','彎曲']],
+   view:'side', hi:['torso'], ms:520, peak:1,
+   keys:[{lean:82,la:84,ra:84}, {lean:66,la:68,ra:68}, {lean:86,la:88,ra:88}, {}, {lean:-26,la:-38,ra:-38,le:100,re:100}, {lean:-26,la:-38,ra:-38,le:100,re:100}, {}]},
+  {no:7, name:'{体|からだ}をねじる{運動|うんどう}', zh:'扭轉身體運動',
+   aim:'讓脊椎靈活，做出良好姿勢', tip:'不要被手臂的力道帶動，腳要站穩不動。',
+   words:[['体','からだ','身體'],['ねじる','ねじる','扭轉']],
+   view:'front', hi:['torso','arms'], ms:600, peak:1, spread:12,
+   keys:[{la:20,ra:20}, {la:92,ra:-62,re:-30,twist:65}, {la:20,ra:20}, {ra:92,la:-62,le:-30,twist:-65}]},
+  {no:8, name:'{腕|うで}を{上下|じょうげ}に{伸|の}ばす{運動|うんどう}', zh:'手臂上下伸展運動',
+   aim:'用快速的動作提升爆發力', tip:'一邊喊口令一邊做，動作會更有力、更快速。',
+   words:[['腕','うで','手臂'],['上下','じょうげ','上下'],['伸ばす','のばす','伸直']],
+   view:'front', hi:['arms'], ms:380, peak:2,
+   keys:[{}, {la:22,ra:22,le:150,re:150}, {la:178,ra:178}, {la:178,ra:178}, {la:22,ra:22,le:150,re:150}, {}]},
+  {no:9, name:'{体|からだ}を{斜|なな}め{下|した}に{曲|ま}げ{胸|むね}を{反|そ}らす{運動|うんどう}', zh:'斜下彎腰再挺胸運動',
+   aim:'伸展背部到腿後側，幫助呼吸器官運作', tip:'挺胸時手肘伸直，大大地吸一口氣。',
+   words:[['斜め','ななめ','斜的'],['下','した','下面'],['曲げる','まげる','彎曲'],['胸','むね','胸部'],['反らす','そらす','向後仰']],
+   view:'front', hi:['torso','arms'], ms:560, peak:1, spread:18,
+   keys:[{}, {tilt:-48,lean:45,la:62,ra:-62}, {tilt:-40,lean:38,la:58,ra:-50}, {tilt:-48,lean:45,la:62,ra:-62}, {lean:-22,la:150,ra:150}, {lean:-22,la:150,ra:150}, {},
+         {tilt:48,lean:45,ra:62,la:-62}, {tilt:40,lean:38,ra:58,la:-50}, {tilt:48,lean:45,ra:62,la:-62}, {lean:-22,la:150,ra:150}, {lean:-22,la:150,ra:150}]},
+  {no:10, name:'{体|からだ}を{回|まわ}す{運動|うんどう}', zh:'繞體（轉腰）運動',
+   aim:'放鬆腰部周圍的肌肉，提高柔軟度', tip:'手肘伸直帶著身體轉，整個軀幹都能放鬆。',
+   words:[['体','からだ','身體'],['回す','まわす','轉動']],
+   view:'front', hi:['torso'], ms:620, peak:0, spread:14,
+   keys:[{tilt:-38,la:168,ra:168}, {tilt:0,lean:58,la:168,ra:168}, {tilt:38,la:168,ra:168}, {tilt:0,lean:-22,la:168,ra:168}]},
+  {no:11, name:'{両脚|りょうあし}で{跳|と}ぶ{運動|うんどう}', zh:'雙腳跳躍運動',
+   aim:'有節奏地跳，促進全身血液循環', tip:'前半輕輕跳，後半開合跳要跳大一點，做出強弱。',
+   words:[['両脚','りょうあし','雙腳'],['跳ぶ','とぶ','跳']],
+   view:'front', hi:['legs'], ms:300, peak:1,
+   keys:[{knee:16}, {jump:26}, {knee:16}, {jump:26}, {knee:16,spread:20,la:100,ra:100}, {jump:28,spread:10,la:150,ra:150}, {knee:16,spread:20,la:100,ra:100}, {jump:26}]},
+  {no:12, name:'{腕|うで}を{振|ふ}って{脚|あし}を{曲|ま}げ{伸|の}ばす{運動|うんどう}', zh:'擺臂屈伸腿運動（整理運動）',
+   aim:'作為整理運動，讓呼吸平穩下來', tip:'動作放慢、放鬆，讓脈搏回到平常的速度。',
+   words:[['腕','うで','手臂'],['振る','ふる','揮動'],['脚','あし','腿'],['曲げる','まげる','彎曲'],['伸ばす','のばす','伸直']],
+   view:'front', hi:['legs','arms'], ms:800,
+   keys:[{la:-22,ra:-22,knee:12}, {la:80,ra:80}]},
+];
+// 容易搞混的組合（表妹指定）
+const PAIRS = {3:10, 10:3, 4:9, 9:4, 5:6, 6:5};
+
+/* ---------------- 小工具 ---------------- */
+const $ = s => document.querySelector(s);
+const RUBY = /\{([^|}]+)\|([^}]+)\}/g;
+const rubyHTML = s => s.replace(RUBY, '<ruby>$1<rt>$2</rt></ruby>');
+const toKana = s => s.replace(RUBY, '$2');
+const toPlain = s => s.replace(RUBY, '$1');
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmt = ms => { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('rt1_' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('rt1_' + k, JSON.stringify(v)); } catch {} },
+};
+function toast(msg) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+}
+
+/* ---------------- 發音 ---------------- */
+let jaVoice = null;
+function pickVoice() {
+  try { const vs = speechSynthesis.getVoices(); jaVoice = vs.find(v => /ja[-_]JP/i.test(v.lang)) || vs.find(v => /^ja/i.test(v.lang)) || null; } catch {}
+}
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch {}
+function say(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ja-JP'; u.rate = .9; if (jaVoice) u.voice = jaVoice;
+    speechSynthesis.speak(u);
+  } catch { toast('這個瀏覽器不支援發音'); }
+}
+
+/* ---------------- 人物動畫 ---------------- */
+const DEF = {tilt:0, lean:0, twist:0, la:0, ra:0, le:0, re:0, spread:4, knee:0, jump:0};
+const LEN = {torso:54, neck:6, head:13, upper:27, fore:25, thigh:34, shin:33, sw:16, hw:8};
+const FLOOR = 188, DEG = Math.PI / 180;
+const step = (p, t, l) => [p[0] + Math.sin(t * DEG) * l, p[1] - Math.cos(t * DEG) * l];
+
+function solve(p, side) {
+  // 角度：0 = 朝上，順時針為正
+  let lt, ls, rt, rs;
+  if (side) { lt = rt = 180 - p.knee * 1.4; ls = rs = 180 + p.knee * 1.4; }
+  else { rt = 180 - (p.spread + p.knee); rs = 180 - (p.spread - p.knee); lt = 180 + (p.spread + p.knee); ls = 180 + (p.spread - p.knee); }
+  const hw = side ? 0 : LEN.hw;
+  const hL = [-hw, 0], hR = [hw, 0];
+  const kL = step(hL, lt, LEN.thigh), fL = step(kL, ls, LEN.shin);
+  const kR = step(hR, rt, LEN.thigh), fR = step(kR, rs, LEN.shin);
+  const tt = side ? p.lean : p.tilt;
+  const shrink = side ? 1 : Math.cos(p.lean * DEG);
+  const neck = step([0, 0], tt, LEN.torso * shrink);
+  const head = step(neck, tt, (LEN.neck + LEN.head) * (side ? 1 : Math.max(.55, shrink)));
+  const sw = side ? 0 : LEN.sw * Math.cos(p.twist * DEG);
+  const px = Math.cos(tt * DEG), py = Math.sin(tt * DEG);
+  const sL = [neck[0] - px * sw, neck[1] - py * sw], sR = [neck[0] + px * sw, neck[1] + py * sw];
+  const aR = tt + 180 - p.ra, aL = side ? tt + 180 - p.la : tt - 180 + p.la;
+  const eR = step(sR, aR, LEN.upper), wR = step(eR, aR - p.re, LEN.fore);
+  const eL = step(sL, aL, LEN.upper), wL = step(eL, side ? aL - p.le : aL + p.le, LEN.fore);
+  const dy = FLOOR - Math.max(fL[1], fR[1]) - p.jump;
+  const T = q => [100 + q[0], dy + q[1]];
+  return {
+    legL:[hL,kL,fL].map(T), legR:[hR,kR,fR].map(T), torso:[[0,0],neck].map(T), hips:[hL,hR].map(T),
+    armL:[sL,eL,wL].map(T), armR:[sR,eR,wR].map(T), shoulders:[sL,sR].map(T),
+    head:T(head), tt, jump:p.jump, side, lean:p.lean,
+  };
+}
+const pts = a => a.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' ');
+const NS = 'http://www.w3.org/2000/svg';
+function mk(parent, tag, attrs) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+
+const figs = new Set();
+class Figure {
+  constructor(svg, action, opts = {}) {
+    this.svg = svg; svg.innerHTML = '';
+    this.static = !!opts.static; this.speed = 1; this.t = Math.random() * 1000;
+    const g = mk(svg, 'g', {'stroke-linecap':'round', 'stroke-linejoin':'round', fill:'none'});
+    this.floor = mk(g, 'line', {x1:30, x2:170, y1:FLOOR + 6, y2:FLOOR + 6, stroke:'var(--line)', 'stroke-width':3});
+    this.shadow = mk(g, 'ellipse', {cx:100, cy:FLOOR + 6, rx:34, ry:5, fill:'var(--line)', stroke:'none'});
+    const W = 9;
+    this.p = {};
+    for (const k of ['armL','legL','legR','torso','shoulders','hips','armR'])
+      this.p[k] = mk(g, 'polyline', {'stroke-width': k === 'torso' ? 12 : (k === 'shoulders' || k === 'hips') ? 10 : W});
+    this.headEl = mk(g, 'circle', {r:LEN.head, 'stroke-width':0});
+    this.eye1 = mk(g, 'circle', {r:1.8, fill:'var(--card)'});
+    this.eye2 = mk(g, 'circle', {r:1.8, fill:'var(--card)'});
+    this.setAction(action);
+    figs.add(this); tick.start();
+  }
+  setAction(a) {
+    this.a = a; this.side = a.view === 'side';
+    const base = Object.assign({}, DEF, a.spread ? {spread:a.spread} : {});
+    this.keys = a.keys.map(k => Object.assign({}, base, k));
+    const hi = new Set(a.hi), c = part => hi.has(part) ? 'var(--hi)' : 'var(--limb)';
+    const far = this.side ? 'var(--far)' : null;
+    this.p.armL.setAttribute('stroke', far || c('arms'));
+    this.p.legL.setAttribute('stroke', far || c('legs'));
+    this.p.armR.setAttribute('stroke', c('arms'));
+    this.p.legR.setAttribute('stroke', c('legs'));
+    this.p.torso.setAttribute('stroke', c('torso'));
+    this.p.shoulders.setAttribute('stroke', c('torso'));
+    this.p.hips.setAttribute('stroke', c('torso'));
+    this.headEl.setAttribute('fill', 'var(--limb)');
+    this.t = 0; this.draw(0);
+  }
+  pose(t) {
+    const n = this.keys.length, ms = this.a.ms || 650;
+    if (this.static || REDUCED) return this.keys[Math.min(this.a.peak ?? 1, n - 1)];
+    const u = ((t / ms) % n + n) % n, i = Math.floor(u) % n, f = u - Math.floor(u);
+    const e = f * f * f * (f * (f * 6 - 15) + 10);
+    const A = this.keys[i], B = this.keys[(i + 1) % n], out = {};
+    for (const k in DEF) out[k] = A[k] + (B[k] - A[k]) * e;
+    return out;
+  }
+  draw(dt) {
+    this.t += dt * this.speed;
+    const s = solve(this.pose(this.t), this.side);
+    for (const k in this.p) this.p[k].setAttribute('points', pts(s[k]));
+    this.headEl.setAttribute('cx', s.head[0]); this.headEl.setAttribute('cy', s.head[1]);
+    // 眼睛：側面只有一隻、朝前；正面兩隻
+    const hx = s.head[0], hy = s.head[1], d = s.tt * DEG;
+    const fx = Math.cos(d), fy = Math.sin(d), ux = Math.sin(d), uy = -Math.cos(d);
+    if (s.side) {
+      this.eye1.setAttribute('cx', hx + fx * 6 + ux * 2); this.eye1.setAttribute('cy', hy + fy * 6 + uy * 2);
+      this.eye2.setAttribute('r', 0);
+    } else {
+      const down = s.lean > 25 ? 0 : 1.8;
+      this.eye1.setAttribute('r', down); this.eye2.setAttribute('r', down);
+      this.eye1.setAttribute('cx', hx - fx * 4.5 + ux); this.eye1.setAttribute('cy', hy - fy * 4.5 + uy);
+      this.eye2.setAttribute('cx', hx + fx * 4.5 + ux); this.eye2.setAttribute('cy', hy + fy * 4.5 + uy);
+    }
+    const sh = Math.max(.45, 1 - s.jump / 45);
+    this.shadow.setAttribute('rx', 34 * sh); this.shadow.setAttribute('opacity', sh);
+  }
+  destroy() { figs.delete(this); }
+}
+let REDUCED = false;
+try { REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch {}
+const tick = {
+  run: false, last: 0,
+  start() { if (this.run) return; this.run = true; this.last = performance.now(); requestAnimationFrame(this.loop); },
+  loop: now => {
+    const dt = Math.max(0, Math.min(64, now - tick.last)); tick.last = now;
+    for (const f of figs) {
+      if (!f.svg.isConnected) { figs.delete(f); continue; }
+      if (f.svg.closest('[hidden]')) continue;
+      try { f.draw(dt); } catch (e) { console.error(e); }
+    }
+    if (figs.size) requestAnimationFrame(tick.loop); else tick.run = false;
+  },
+};
+
+/* ---------------- 排行榜 ---------------- */
+async function rpc(fn, args) {
+  const headers = {'Content-Type': 'application/json', apikey: SUPABASE_KEY};
+  if (SUPABASE_KEY.startsWith('eyJ')) headers.Authorization = 'Bearer ' + SUPABASE_KEY; // 舊版 anon key
+  const r = await fetch(SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/rpc/' + fn, {method: 'POST', headers, body: JSON.stringify(args || {})});
+  if (!r.ok) throw new Error('伺服器回應 ' + r.status);
+  return r.json();
+}
+const pid = (() => { let p = store.get('pid'); if (!p) { p = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join(''); store.set('pid', p); } return p; })();
+const sortRows = rows => rows.slice().sort((a, b) => b.score - a.score || a.timeMs - b.timeMs || String(a.at).localeCompare(String(b.at)));
+
+const Board = {
+  mode: SUPABASE_URL && SUPABASE_KEY ? 'remote' : 'local',
+  async top() {
+    if (this.mode === 'remote') return rpc('top_scores');
+    return {ok:true, rows: sortRows(store.get('localBoard', [])).slice(0, 10)};
+  },
+  async submit(entry) {
+    if (this.mode === 'remote') return rpc('submit_score', {p_pid: pid, p_name: entry.name, p_score: entry.score, p_time_ms: entry.timeMs});
+    // 本機：同一個暱稱只留最佳
+    let rows = store.get('localBoard', []);
+    const old = rows.find(r => r.name === entry.name);
+    const better = !old || entry.score > old.score || (entry.score === old.score && entry.timeMs < old.timeMs);
+    if (better) { rows = rows.filter(r => r.name !== entry.name); rows.push({name:entry.name, score:entry.score, timeMs:entry.timeMs, at:new Date().toISOString(), me:true}); }
+    store.set('localBoard', sortRows(rows).slice(0, 50));
+    return {ok:true, improved:better, rows: sortRows(rows).slice(0, 10)};
+  },
+};
+const TAGS = {remote:'全部玩家', local:'只限這台裝置'};
+function renderBoard(el, tagEl, rows, highlightName) {
+  tagEl.textContent = TAGS[Board.mode];
+  if (!rows || !rows.length) { el.innerHTML = '<li class="empty">還沒有人上榜，來當第一名吧！</li>'; return; }
+  el.innerHTML = rows.map((r, i) =>
+    `<li class="${(r.me || (highlightName && r.name === highlightName)) ? 'me' : ''}"><span class="rk">${i + 1}</span><span class="nm">${esc(r.name)}</span><span class="sc">${r.score}<small style="font-weight:500;color:var(--muted)">/12</small></span><span class="tm">${fmt(r.timeMs)}</span></li>`).join('');
+}
+async function loadBoard(el, tagEl, highlightName) {
+  try {
+    const res = await Board.top();
+    renderBoard(el, tagEl, res.rows, highlightName);
+    return true;
+  } catch (e) {
+    tagEl.textContent = '連線失敗';
+    el.innerHTML = '<li class="empty">排行榜暫時連不上，遊戲還是可以玩。</li>';
+    return false;
+  }
+}
+
+/* ---------------- 畫面切換 ---------------- */
+const screens = ['home', 'quiz', 'result', 'gallery'];
+function show(id) {
+  screens.forEach(s => $('#' + s).hidden = s !== id);
+  window.scrollTo({top:0});
+  if (id !== 'quiz') stopTimer();
+}
+
+/* ---------------- 遊戲 ---------------- */
+let G = null, timerId = 0, qFig = null;
+function buildQuestions(mode) {
+  const list = mode === 'random' ? shuffle(ACTIONS) : ACTIONS.slice();
+  return list.map(a => {
+    let d;
+    if (PAIRS[a.no]) d = ACTIONS[PAIRS[a.no] - 1];
+    else {
+      const pool = ACTIONS.filter(x => toPlain(x.name) !== toPlain(a.name));
+      d = pool[Math.random() * pool.length | 0];
+    }
+    return {a, opts: shuffle([a, d])};
+  });
+}
+function start(mode) {
+  G = {mode, qs: buildQuestions(mode), i: 0, results: [], t0: performance.now(), done: false};
+  $('#qMode').textContent = mode === 'random' ? '・挑戰' : '・照順序';
+  $('#stamps').innerHTML = Array.from({length: 12}, (_, i) => `<span>${i + 1}</span>`).join('');
+  show('quiz');
+  if (!qFig) qFig = new Figure($('#qFig'), ACTIONS[0]);
+  startTimer();
+  renderQ();
+}
+function startTimer() {
+  stopTimer();
+  timerId = setInterval(() => { if (G && !G.done) $('#timer').textContent = fmt(performance.now() - G.t0); }, 250);
+}
+function stopTimer() { clearInterval(timerId); }
+function renderQ() {
+  const q = G.qs[G.i];
+  $('#qNo').textContent = G.i + 1;
+  [...$('#stamps').children].forEach((s, i) => s.classList.toggle('cur', i === G.i));
+  qFig.setAction(q.a);
+  $('#qView').textContent = q.a.view === 'side' ? '側面' : '正面';
+  $('#qFig').setAttribute('aria-label', `第 ${G.i + 1} 題的體操動作動畫`);
+  $('#opts').innerHTML = q.opts.map((o, i) =>
+    `<button class="opt jp" data-i="${i}" lang="ja"><span class="k">${i + 1}</span><span>${rubyHTML(o.name)}</span></button>`).join('');
+  $('#fb').innerHTML = '';
+  $('#opts').querySelector('.opt').focus({preventScroll:true});
+}
+function answer(i) {
+  const q = G.qs[G.i];
+  if (q.answered) return;
+  q.answered = true;
+  const picked = q.opts[i];
+  const ok = toPlain(picked.name) === toPlain(q.a.name);
+  G.results.push({a: q.a, ok});
+  const btns = [...$('#opts').children];
+  btns.forEach((b, j) => {
+    b.disabled = true;
+    const right = toPlain(q.opts[j].name) === toPlain(q.a.name);
+    if (right) b.classList.add('right');
+    else if (j === i) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  const st = $('#stamps').children[G.i];
+  st.classList.remove('cur');
+  if (ok) { st.classList.add('ok', 'pop'); st.textContent = '◎'; } else st.classList.add('ng');
+  const last = G.i === G.qs.length - 1;
+  if (last) { G.done = true; G.timeMs = performance.now() - G.t0; $('#timer').textContent = fmt(G.timeMs); }
+  const a = q.a;
+  $('#fb').innerHTML = `
+    <div class="fb ${ok ? 'ok' : 'ng'}">
+      <div class="verdict">${ok ? '⭕ 正解！<span class="jp" lang="ja">せいかい</span>' : '❌ 差一點！<span class="jp" lang="ja">ざんねん</span>'}</div>
+      <div class="name jp" lang="ja">${a.no}. ${rubyHTML(a.name)}</div>
+      <div class="zh">${esc(a.zh)}・${esc(a.aim)}</div>
+      <p class="tip">💡 ${esc(a.tip)}</p>
+      <div class="vocab" lang="ja">${a.words.map(w => `<button data-say="${esc(w[1])}"><b class="jp">${esc(w[0])}</b><span>${esc(w[1])}・${esc(w[2])}</span></button>`).join('')}</div>
+      <div class="fb-actions">
+        <button class="say" data-say="${esc(toKana(a.name))}">🔊 聽發音</button>
+        <button class="btn primary small" id="nextBtn">${last ? '看結果 →' : '下一題 →'}</button>
+      </div>
+    </div>`;
+  $('#nextBtn').focus({preventScroll:true});
+  $('#fb').scrollIntoView({behavior: REDUCED ? 'auto' : 'smooth', block: 'nearest'});
+}
+function next() {
+  if (G.i < G.qs.length - 1) { G.i++; renderQ(); } else finish();
+}
+function title(score) {
+  return score === 12 ? 'パーフェクト！' : score >= 9 ? 'すごい！' : score >= 6 ? 'いいね！' : 'がんばろう！';
+}
+function finish() {
+  stopTimer();
+  const score = G.results.filter(r => r.ok).length;
+  G.score = score;
+  $('#rScore').textContent = score;
+  $('#rTitle').textContent = title(score);
+  $('#rTime').textContent = fmt(G.timeMs);
+  $('#rStamps').innerHTML = G.results.map((r, i) => `<span class="${r.ok ? 'ok' : 'ng'}">${r.ok ? '◎' : i + 1}</span>`).join('');
+  // 本機最佳（只計挑戰）
+  let best = store.get('best', null);
+  if (G.mode === 'random' && (!best || score > best.score || (score === best.score && G.timeMs < best.timeMs))) {
+    best = {score, timeMs: G.timeMs}; store.set('best', best);
+  }
+  $('#rBest').textContent = best ? `${best.score}/12` : '—';
+  const wrong = G.results.filter(r => !r.ok);
+  $('#review').innerHTML = wrong.length ? wrong.map(r => `
+    <li><svg viewBox="0 -24 200 222" data-mini="${r.a.no}" aria-hidden="true"></svg>
+    <div class="t jp" lang="ja">${r.a.no}. ${rubyHTML(r.a.name)}<small>${esc(r.a.zh)}</small></div></li>`).join('')
+    : '<li class="allright">全部答對，太厲害了！🎉</li>';
+  $('#review').querySelectorAll('svg[data-mini]').forEach(s => new Figure(s, ACTIONS[s.dataset.mini - 1]));
+  const ranked = G.mode === 'random';
+  $('#submitBox').hidden = !ranked;
+  $('#orderNote').hidden = ranked;
+  $('#submitBtn').disabled = false;
+  $('#nick').value = store.get('nick', '');
+  $('#submitNote').textContent = Board.mode === 'local' ? '目前沒有連上線上排行榜，成績只會存在這台裝置。' : '同一台裝置只保留你最好的一次成績。';
+  show('result');
+  loadBoard($('#board2'), $('#boardTag2'), store.get('nick', ''));
+}
+
+/* ---------------- 圖鑑 ---------------- */
+let galleryBuilt = false;
+function openGallery() {
+  if (!galleryBuilt) {
+    $('#grid').innerHTML = ACTIONS.map(a => `
+      <article class="card g">
+        <div class="stage"><svg class="fig" viewBox="0 -24 200 222" data-g="${a.no}" role="img" aria-label="${esc(a.zh)}動畫"></svg></div>
+        <div class="row"><span class="no">No.${a.no}・${a.view === 'side' ? '側面' : '正面'}</span><button class="say" data-say="${esc(toKana(a.name))}" aria-label="播放發音">🔊</button></div>
+        <div class="nm jp" lang="ja">${rubyHTML(a.name)}</div>
+        <div class="zh">${esc(a.zh)}</div>
+        <p class="tip">💡 ${esc(a.tip)}</p>
+      </article>`).join('');
+    $('#grid').querySelectorAll('svg[data-g]').forEach(s => new Figure(s, ACTIONS[s.dataset.g - 1]));
+    galleryBuilt = true;
+  }
+  show('gallery');
+}
+
+/* ---------------- 事件 ---------------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  if (t.dataset.start) return start(t.dataset.start);
+  if (t.dataset.say) return say(t.dataset.say);
+  if (t.classList.contains('opt')) return answer(+t.dataset.i);
+  if (t.id === 'nextBtn') return next();
+});
+document.addEventListener('keydown', e => {
+  if ($('#quiz').hidden || !G || e.target.tagName === 'INPUT') return;
+  const q = G.qs[G.i];
+  if (!q.answered && (e.key === '1' || e.key === '2')) answer(+e.key - 1);
+});
+$('#homeBtn').onclick = () => { show('home'); loadBoard($('#board'), $('#boardTag')); };
+$('#toHome').onclick = $('#homeBtn').onclick;
+$('#againBtn').onclick = () => start(G ? G.mode : 'random');
+$('#galleryBtn').onclick = openGallery;
+$('#slowBtn').onclick = e => {
+  const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+  e.currentTarget.setAttribute('aria-pressed', on);
+  if (qFig) qFig.speed = on ? .45 : 1;
+};
+$('#rubyBtn').onclick = e => {
+  const on = document.body.classList.toggle('no-ruby') === false;
+  e.currentTarget.setAttribute('aria-pressed', on); store.set('ruby', on);
+};
+if (store.get('ruby', true) === false) { document.body.classList.add('no-ruby'); $('#rubyBtn').setAttribute('aria-pressed', 'false'); }
+$('#themeBtn').onclick = () => {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  store.set('theme', document.documentElement.dataset.theme);
+};
+{ const th = store.get('theme', null); if (th) document.documentElement.dataset.theme = th; }
+
+$('#submitForm').onsubmit = async e => {
+  e.preventDefault();
+  const name = $('#nick').value.trim().replace(/[<>]/g, '').slice(0, 10);
+  if (!name) return;
+  store.set('nick', name);
+  const btn = $('#submitBtn'); btn.disabled = true; btn.textContent = '送出中…';
+  try {
+    const res = await Board.submit({name, score: G.score, timeMs: Math.round(G.timeMs)});
+    if (!res || !res.ok) throw new Error(res && res.error || 'fail');
+    $('#submitNote').textContent = res.improved === false ? '已登錄！不過你之前的成績比較好，榜上保留那一次。' : '已登上排行榜！🎉';
+    renderBoard($('#board2'), $('#boardTag2'), res.rows, name);
+    btn.textContent = '已送出';
+  } catch (err) {
+    $('#submitNote').textContent = '送出失敗：' + (err && err.message || '請稍後再試');
+    btn.disabled = false; btn.textContent = '再試一次';
+  }
+};
+
+/* ---------------- 首頁開場 ---------------- */
+new Figure($('#heroFig'), ACTIONS[0]);
+// 首頁小人輪流示範幾個動作
+{ const demo = [1, 3, 7, 11, 10, 8]; let k = 0; const hero = [...figs][0];
+  setInterval(() => { if (!$('#home').hidden) { k = (k + 1) % demo.length; hero.setAction(ACTIONS[demo[k] - 1]); } }, 4200); }
+loadBoard($('#board'), $('#boardTag'));
+if (Board.mode === 'local') $('#boardNote').textContent = '目前是離線模式：排行榜只記錄這台裝置的成績。設定好 Supabase 後，所有人的成績會放在一起。';
+</script>
+</body>
+</html>
